@@ -1,0 +1,10 @@
+streamlit
+google-cloud-bigquery
+pandas
+plotly
+seaborn
+matplotlib
+db-dtypes
+konlpy
+wordcloud
+python-dotenv
