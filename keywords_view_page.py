@@ -9,12 +9,15 @@ from ui_components import create_keyword_filter_section, display_keyword_reviews
     render_review_cards, create_keyword_comparison_section, add_search_functionality
 
 
-def keyword_analysis_page():
+def keyword_analysis_page(client):
     # ----------------------- 리뷰 데이터 로드 -----------------------
     # ------------------- 페이지·사이드바 설정 -------------------
     data_limit = st.sidebar.selectbox("데이터 개수", [1_000, 2_000, 3_000], index=1)
     with st.spinner("데이터를 로드하는 중..."):
-        df = load_predicted_reviews(limit=data_limit)  # BigQuery → DataFrame
+        df = load_predicted_reviews(
+            _client=client,
+            limit=data_limit
+        )  # BigQuery → DataFrame
 
 
     st.success(f"총 {len(df):,}개의 리뷰 데이터를 로드했습니다.")

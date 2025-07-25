@@ -6,9 +6,8 @@ from config import project_id, layer, product_table, review_table, \
 
 
 @st.cache_data
-def load_reviews(limit=1000):
+def load_reviews(_client, limit=1000):
     """BigQuery에서 기본 리뷰 데이터 로드"""
-    client = get_bigquery_client()
 
     query = f"""
         SELECT 
@@ -23,7 +22,7 @@ def load_reviews(limit=1000):
         WHERE content IS NOT NULL and star > 0 
         LIMIT {limit}
         """
-    df = client.query(query).to_dataframe()
+    df = _client.query(query).to_dataframe()
     # 날짜 컬럼을 명시적으로 datetime으로 변환
     df['created_at'] = pd.to_datetime(df['created_at'])
 
@@ -31,9 +30,8 @@ def load_reviews(limit=1000):
 
 
 @st.cache_data
-def load_products_for_selection(limit=100):
+def load_products_for_selection(_client, limit=100):
     """상품 선택용 데이터 로드"""
-    client = get_bigquery_client()
     query = f"""
     SELECT 
         product_id,
@@ -49,13 +47,12 @@ def load_products_for_selection(limit=100):
     ORDER BY review_count DESC
     LIMIT {limit}
     """
-    return client.query(query).to_dataframe()
+    return _client.query(query).to_dataframe()
 
 
 @st.cache_data
-def load_predicted_reviews(limit=1000):
+def load_predicted_reviews(_client, limit=1000):
     """BigQuery에서 predicted_reviews 데이터 로드"""
-    client = get_bigquery_client()
     query = f"""
     SELECT
         review_uid,
@@ -75,15 +72,14 @@ def load_predicted_reviews(limit=1000):
     ORDER BY created_at DESC
     LIMIT {limit}
     """
-    df = client.query(query).to_dataframe()
+    df = _client.query(query).to_dataframe()
     df['created_at'] = pd.to_datetime(df['created_at'])
     return df
 
 
 @st.cache_data
-def load_product_reviews_with_sentiment(product_id, limit=300):
+def load_product_reviews_with_sentiment(_client, product_id, limit=300):
     """선택된 상품의 predicted_reviews 데이터 로드"""
-    client = get_bigquery_client()
     query = f"""
     SELECT
         review_id,
@@ -101,7 +97,7 @@ def load_product_reviews_with_sentiment(product_id, limit=300):
     ORDER BY created_at DESC
     LIMIT {limit}
     """
-    df = client.query(query).to_dataframe()
+    df = _client.query(query).to_dataframe()
     if not df.empty:
         df['created_at'] = pd.to_datetime(df['created_at'])
         # 기존 sentiment 컬럼을 pred_label로 대체

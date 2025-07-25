@@ -1,5 +1,6 @@
 import streamlit as st
 
+from config import get_bigquery_client
 from product_reviews_page import product_review_page
 from keywords_view_page import keyword_analysis_page
 
@@ -14,6 +15,7 @@ def main():
             "상품별 리뷰 분석"
         ]
     )
+    client = get_bigquery_client()
 
     if page == "키워드 분석":
         st.set_page_config(
@@ -24,10 +26,10 @@ def main():
         )
         st.title("📊 키워드별 빈도 + 긍정률 분석 대시보드")
         st.markdown("---")
-        keyword_analysis_page()
+        keyword_analysis_page(client=client)
 
     elif page == "상품별 리뷰 분석":
-        product_review_page()
+        product_review_page(client=client)
 
 
 if __name__ == "__main__":
