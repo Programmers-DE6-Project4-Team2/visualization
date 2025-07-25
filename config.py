@@ -10,6 +10,7 @@ project_id = os.getenv('GCP_PROJECT_ID')
 layer = os.getenv('LAYER')
 product_table = os.getenv('PRODUCT_TABLE')
 review_table = os.getenv('REVIEW_TABLE')
+predicted_review_table = os.getenv('PREDICTED_REVIEW_TABLE')
 
 
 @st.cache_resource
