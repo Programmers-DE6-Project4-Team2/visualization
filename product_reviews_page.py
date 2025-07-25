@@ -6,11 +6,16 @@ from data_processor import load_products_for_selection, \
     load_product_reviews_with_sentiment
 
 
-def product_review_page():
+def product_review_page(client):
     """상품별 리뷰 분석 페이지"""
     # 상품 데이터 로드
+    product_limit = 500
+    product_review_limit = 500
     with st.spinner("상품 데이터 로딩 중..."):
-        products_df = load_products_for_selection()
+        products_df = load_products_for_selection(
+            _client=client,
+            limit=product_limit
+        )
 
     if products_df.empty:
         st.error("상품 데이터를 불러올 수 없습니다.")
@@ -87,7 +92,11 @@ def product_review_page():
 
     # 리뷰 데이터 로드
     with st.spinner("리뷰 데이터 분석 중..."):
-        reviews_df = load_product_reviews_with_sentiment(selected_product_id)
+        reviews_df = load_product_reviews_with_sentiment(
+            _client=client,
+            product_id=selected_product_id,
+            limit=product_review_limit
+        )
 
     if reviews_df.empty:
         st.warning("이 상품에 대한 리뷰 데이터가 없습니다.")
