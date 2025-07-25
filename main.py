@@ -1,5 +1,3 @@
-import os
-
 import streamlit as st
 
 from product_reviews_page import product_review_page
@@ -12,19 +10,14 @@ def main():
     page = st.sidebar.selectbox(
         "페이지 선택",
         [
-            "Superset Charts",
             "키워드 분석",
             "상품별 리뷰 분석"
         ]
     )
 
-    if page == "Superset Charts":
-        superset_url = os.getenv("SUPERSET_URL") + "?standalone=true"
-        st.components.v1.iframe(superset_url, height=600, scrolling=True)
-
-    elif page == "키워드 분석":
+    if page == "키워드 분석":
         st.set_page_config(
-            page_title="📊 리뷰 데이터 분석 대시보드",
+            page_title="리뷰 데이터 분석 대시보드",
             page_icon="📊",
             layout="wide",
             initial_sidebar_state="expanded"
@@ -35,6 +28,7 @@ def main():
 
     elif page == "상품별 리뷰 분석":
         product_review_page()
+
 
 if __name__ == "__main__":
     main()

@@ -1,11 +1,12 @@
 import streamlit as st
 import pandas as pd
 
-from config import project_id, layer, product_table, review_table, get_bigquery_client
+from config import project_id, layer, product_table, review_table, \
+    get_bigquery_client, predicted_review_table
 
 
 @st.cache_data
-def load_reviews(limit=10000):
+def load_reviews(limit=1000):
     """BigQuery에서 기본 리뷰 데이터 로드"""
     client = get_bigquery_client()
 
@@ -30,7 +31,7 @@ def load_reviews(limit=10000):
 
 
 @st.cache_data
-def load_products_for_selection(limit=500):
+def load_products_for_selection(limit=100):
     """상품 선택용 데이터 로드"""
     client = get_bigquery_client()
     query = f"""
@@ -52,47 +53,57 @@ def load_products_for_selection(limit=500):
 
 
 @st.cache_data
-def load_product_reviews_with_sentiment(product_id, limit=300):
-    """선택된 상품의 리뷰 데이터 로드 및 감성 분류"""
+def load_predicted_reviews(limit=1000):
+    """BigQuery에서 predicted_reviews 데이터 로드"""
     client = get_bigquery_client()
     query = f"""
-    SELECT 
+    SELECT
+        review_uid,
+        review_id,
+        product_id,
+        content,
+        star,
+        true_label,
+        pred_label,
+        is_correct,
+        category,
+        platform,
+        created_at,
+        run_date
+    FROM `{project_id}.{layer}.{predicted_review_table}`  # 테이블명 변경
+    WHERE content IS NOT NULL and star > 0
+    ORDER BY created_at DESC
+    LIMIT {limit}
+    """
+    df = client.query(query).to_dataframe()
+    df['created_at'] = pd.to_datetime(df['created_at'])
+    return df
+
+
+@st.cache_data
+def load_product_reviews_with_sentiment(product_id, limit=300):
+    """선택된 상품의 predicted_reviews 데이터 로드"""
+    client = get_bigquery_client()
+    query = f"""
+    SELECT
         review_id,
         content,
         star,
+        pred_label,
+        true_label,
+        is_correct,
         created_at,
         platform
-    FROM `{project_id}.{layer}.{review_table}`
-    WHERE product_id = '{product_id}' 
-    AND content IS NOT NULL 
+    FROM `{project_id}.{layer}.{predicted_review_table}`  # 테이블명 변경
+    WHERE product_id = '{product_id}'
+    AND content IS NOT NULL
     AND star > 0
     ORDER BY created_at DESC
     LIMIT {limit}
     """
     df = client.query(query).to_dataframe()
-
     if not df.empty:
         df['created_at'] = pd.to_datetime(df['created_at'])
-        # 간단한 감성 분류 (별점 기준)
-        df['sentiment'] = df['star'].apply(
-            lambda x: 'positive' if x >= 4 else 'negative' if x <= 2 else 'neutral'
-        )
-    return df
-
-
-def add_sentiment_labels(df):
-    """별점 기반으로 감성 라벨 생성"""
-
-    def classify_sentiment(star):
-        if star >= 4:
-            return 'positive'
-        elif star <= 2:
-            return 'negative'
-        else:
-            return 'neutral'
-
-    df['pred_label'] = df['star'].apply(classify_sentiment)
-    df['true_label'] = df['pred_label']  # 별점 기반이므로 동일
-    df['is_correct'] = True  # 별점 기반 분류이므로 항상 True
-
+        # 기존 sentiment 컬럼을 pred_label로 대체
+        df['sentiment'] = df['pred_label']
     return df

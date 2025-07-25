@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-from data_processor import load_reviews, add_sentiment_labels
+from data_processor import load_predicted_reviews
 from keyword_analyzer import extract_keywords_batch, calculate_keyword_sentiment_streaming
 from chart_generator import create_bubble_chart, create_top_keywords_chart, \
     create_sentiment_distribution_chart, create_correlation_matrix
@@ -12,11 +12,10 @@ from ui_components import create_keyword_filter_section, display_keyword_reviews
 def keyword_analysis_page():
     # ----------------------- 리뷰 데이터 로드 -----------------------
     # ------------------- 페이지·사이드바 설정 -------------------
-
-    data_limit = st.sidebar.selectbox("데이터 개수", [1_000, 5_000, 10_000], index=1)
+    data_limit = st.sidebar.selectbox("데이터 개수", [1_000, 2_000, 3_000], index=1)
     with st.spinner("데이터를 로드하는 중..."):
-        df = load_reviews(limit=data_limit)  # BigQuery → DataFrame
-        df = add_sentiment_labels(df)  # 별점 기반 라벨 추가
+        df = load_predicted_reviews(limit=data_limit)  # BigQuery → DataFrame
+
 
     st.success(f"총 {len(df):,}개의 리뷰 데이터를 로드했습니다.")
 

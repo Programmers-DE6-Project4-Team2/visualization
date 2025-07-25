@@ -40,7 +40,7 @@ def display_keyword_reviews(df, keyword, max_reviews=50):
         st.metric("총 리뷰 수", f"{len(keyword_reviews):,}")
 
     with col2:
-        positive_rate = (keyword_reviews['pred_label'] == 'positive').mean() * 100
+        positive_rate = (df['pred_label'] == 'positive').mean() * 100
         st.metric("긍정률", f"{positive_rate:.1f}%")
 
     with col3:

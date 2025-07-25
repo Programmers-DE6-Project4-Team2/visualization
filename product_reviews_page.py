@@ -96,6 +96,10 @@ def product_review_page():
     # 감성 분석 결과
     sentiment_counts = reviews_df['sentiment'].value_counts()
 
+    if 'is_correct' in reviews_df.columns:
+        accuracy = reviews_df['is_correct'].mean() * 100
+        st.metric("🎯 예측 정확도", f"{accuracy:.1f}%")
+
     st.markdown("### 📊 리뷰 감성 분석")
     col1, col2, col3 = st.columns(3)
 
