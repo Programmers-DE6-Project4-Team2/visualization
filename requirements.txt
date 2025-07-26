@@ -8,3 +8,4 @@ db-dtypes
 konlpy
 wordcloud
 python-dotenv
+JPype1>=1.3.0
