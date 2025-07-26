@@ -211,3 +211,5 @@ __marimo__/
 gcp-service-account.json
 
 .env
+.streamlit/*
+.streamlit/secrets.toml
