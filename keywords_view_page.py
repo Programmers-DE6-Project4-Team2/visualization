@@ -12,7 +12,7 @@ from ui_components import create_keyword_filter_section, display_keyword_reviews
 def keyword_analysis_page(client):
     # ----------------------- 리뷰 데이터 로드 -----------------------
     # ------------------- 페이지·사이드바 설정 -------------------
-    data_limit = st.sidebar.selectbox("데이터 개수", [1_000, 2_000, 3_000], index=1)
+    data_limit = st.sidebar.selectbox("데이터 개수", [1_000, 3_000, 5_000, 1_0000], index=1)
     with st.spinner("데이터를 로드하는 중..."):
         df = load_predicted_reviews(
             _client=client,
