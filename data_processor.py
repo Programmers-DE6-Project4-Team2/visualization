@@ -33,19 +33,30 @@ def load_reviews(_client, limit=1000):
 def load_products_for_selection(_client, limit=100):
     """상품 선택용 데이터 로드"""
     query = f"""
-    SELECT 
-        product_id,
-        name,
-        brand,
-        price,
-        rating,
-        review_count,
-        category,
-        platform
-    FROM `{project_id}.{layer}.{product_table}`
-    WHERE rating > 0 AND review_count > 0
-    ORDER BY review_count DESC
-    LIMIT {limit}
+    WITH top_reviewed_products AS (
+        SELECT 
+            product_id,
+            COUNT(*) AS review_count_from_reviews
+        FROM `{project_id}.{layer}.{predicted_review_table}`
+        WHERE product_id IS NOT NULL
+        GROUP BY product_id
+        ORDER BY COUNT(*) DESC
+        LIMIT {limit}
+    )
+    SELECT
+        p.product_id,
+        p.name,
+        p.brand,
+        p.price,
+        p.rating,
+        p.review_count,
+        p.category,
+        p.platform,
+        trp.review_count_from_reviews  -- 실제 리뷰 개수도 함께 조회
+    FROM `{project_id}.{layer}.{product_table}` p
+    INNER JOIN top_reviewed_products trp
+    ON p.product_id = trp.product_id
+    ORDER BY trp.review_count_from_reviews DESC
     """
     return _client.query(query).to_dataframe()
 

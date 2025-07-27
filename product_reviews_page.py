@@ -162,7 +162,7 @@ def show_sentiment_samples(reviews_df, sentiment_type, sentiment_name):
             f"{sentiment_name} 리뷰 샘플 개수",
             min_value=1,
             max_value=min(15, total_reviews),
-            value=min(5, total_reviews),
+            value=min(10, total_reviews),
             key=f"{sentiment_type}_count"
         )
 
